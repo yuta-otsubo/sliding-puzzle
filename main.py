@@ -295,15 +295,12 @@ class SlidingPuzzle:
                             msg = ''
                         elif self.solve_rect.collidepoint(event.pos):
                             try:
-                                # まず現在の状態から初期状態に戻す
-                                self.reset_animation(self.all_moves)
-                                # 次に解決手順の逆を実行して解く
-                                solution_to_solve = self.solution_seq[:]
-                                solution_to_solve.reverse()
-                                for move in solution_to_solve:
-                                    if self.is_valid_move(self.main_board, move):
-                                        self.slide_animation(move, 'Solving...', int(TILE_SIZE / 3))
-                                        self.make_move(self.main_board, move)
+                                # パズルを直接解決された状態に設定
+                                self.main_board = self.get_starting_board()
+                                # アニメーションで解決を表示
+                                self.draw_board('Solving...')
+                                pygame.display.update()
+                                pygame.time.wait(500)
                                 self.all_moves = []
                                 msg = 'Solved!'
                             except Exception as e:
