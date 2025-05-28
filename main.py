@@ -169,6 +169,17 @@ class SlidingPuzzle:
     def slide_animation(self, direction, message, animation_speed):
         # Slide animation for tiles
         blankx, blanky = self.get_blank_position(self.main_board)
+        
+        # Check if the move is valid
+        if direction == UP and blanky >= BOARD_SIZE - 1:
+            return  # Invalid move
+        elif direction == DOWN and blanky <= 0:
+            return  # Invalid move
+        elif direction == LEFT and blankx >= BOARD_SIZE - 1:
+            return  # Invalid move
+        elif direction == RIGHT and blankx <= 0:
+            return  # Invalid move
+            
         if direction == UP:
             movex = blankx
             movey = blanky + 1
@@ -181,6 +192,10 @@ class SlidingPuzzle:
         elif direction == RIGHT:
             movex = blankx - 1
             movey = blanky
+        
+        # Additional boundary check
+        if movex < 0 or movex >= BOARD_SIZE or movey < 0 or movey >= BOARD_SIZE:
+            return  # Out of bounds
         
         # Prepare for animation
         self.draw_board(message)
@@ -279,9 +294,21 @@ class SlidingPuzzle:
                             self.all_moves = []
                             msg = ''
                         elif self.solve_rect.collidepoint(event.pos):
-                            self.reset_animation(self.solution_seq + self.all_moves)
-                            self.all_moves = []
-                            msg = ''
+                            try:
+                                # まず現在の状態から初期状態に戻す
+                                self.reset_animation(self.all_moves)
+                                # 次に解決手順の逆を実行して解く
+                                solution_to_solve = self.solution_seq[:]
+                                solution_to_solve.reverse()
+                                for move in solution_to_solve:
+                                    if self.is_valid_move(self.main_board, move):
+                                        self.slide_animation(move, 'Solving...', int(TILE_SIZE / 3))
+                                        self.make_move(self.main_board, move)
+                                self.all_moves = []
+                                msg = 'Solved!'
+                            except Exception as e:
+                                print(f"Error during solve: {e}")
+                                msg = 'Solve failed'
                     else:
                         # Tile was clicked
                         blankx, blanky = self.get_blank_position(self.main_board)
