@@ -18,40 +18,40 @@ ORANGE = (255, 165, 0)  # Amazonカラー
 # メイン関数
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, RESET_SURF, RESET_RECT, NEW_SURF, NEW_RECT, SOLVE_SURF, SOLVE_RECT
-    
+
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption('スライドパズル')
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
-    
+
     # ボタンの設定
     RESET_SURF, RESET_RECT = makeText('リセット', BLUE, WHITE, WINDOW_WIDTH - 120, WINDOW_HEIGHT - 90)
     NEW_SURF, NEW_RECT = makeText('新規', BLUE, WHITE, WINDOW_WIDTH - 120, WINDOW_HEIGHT - 60)
     SOLVE_SURF, SOLVE_RECT = makeText('解く', BLUE, WHITE, WINDOW_WIDTH - 120, WINDOW_HEIGHT - 30)
-    
+
     # ボードの初期化
     main_board, solution_seq = generateNewPuzzle(80)
     SOLVEDBOARD = getStartingBoard()
     all_moves = []
-    
+
     while True:  # メインゲームループ
         slideTo = None
         msg = ''
-        
+
         # ボードが解かれたかチェック
         if main_board == SOLVEDBOARD:
             msg = 'クリア!'
-        
+
         drawBoard(main_board, msg)
-        
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == MOUSEBUTTONUP:
                 spotx, spoty = getSpotClicked(main_board, event.pos[0], event.pos[1])
-                
+
                 if (spotx, spoty) == (None, None):
                     # ボタンがクリックされたかチェック
                     if RESET_RECT.collidepoint(event.pos):
@@ -74,7 +74,7 @@ def main():
                         slideTo = UP
                     elif spotx == blankx and spoty == blanky - 1:
                         slideTo = DOWN
-            
+
             elif event.type == KEYUP:
                 # キーボード入力
                 if event.key in (K_LEFT, K_a) and isValidMove(main_board, LEFT):
@@ -92,12 +92,12 @@ def main():
                 elif event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-        
+
         if slideTo:
             slideAnimation(main_board, slideTo, 'タイルをスライド', 8)
             makeMove(main_board, slideTo)
             all_moves.append(slideTo)
-        
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -133,7 +133,7 @@ def getBlankPosition(board):
 def makeMove(board, move):
     # 指定された方向に移動
     blankx, blanky = getBlankPosition(board)
-    
+
     if move == UP:
         board[blankx][blanky], board[blankx][blanky + 1] = board[blankx][blanky + 1], board[blankx][blanky]
     elif move == DOWN:
@@ -154,7 +154,7 @@ def isValidMove(board, move):
 def getRandomMove(board, lastMove=None):
     # ランダムな移動を取得（前回の移動と逆の移動は避ける）
     validMoves = [UP, DOWN, LEFT, RIGHT]
-    
+
     # 前回の移動と逆の移動を削除
     if lastMove == UP or not isValidMove(board, DOWN):
         validMoves.remove(DOWN)
@@ -164,7 +164,7 @@ def getRandomMove(board, lastMove=None):
         validMoves.remove(RIGHT)
     if lastMove == RIGHT or not isValidMove(board, LEFT):
         validMoves.remove(LEFT)
-    
+
     return random.choice(validMoves)
 
 def getSpotClicked(board, x, y):
@@ -195,16 +195,16 @@ def getLeftTopOfTile(tilex, tiley):
 def drawBoard(board, message):
     # ボードを描画
     DISPLAYSURF.fill(BLACK)
-    
+
     if message:
         textSurf, textRect = makeText(message, WHITE, BLACK, 5, 5)
         DISPLAYSURF.blit(textSurf, textRect)
-    
+
     for tilex in range(len(board)):
         for tiley in range(len(board[0])):
             if board[tilex][tiley]:
                 drawTile(tilex, tiley, board[tilex][tiley])
-    
+
     left, top = getLeftTopOfTile(0, 0)
     width = BOARD_SIZE * TILE_SIZE
     height = BOARD_SIZE * TILE_SIZE
@@ -225,15 +225,15 @@ def slideAnimation(board, direction, message, animationSpeed):
     elif direction == RIGHT:
         movex = blankx - 1
         movey = blanky
-    
+
     # アニメーションの準備
     drawBoard(board, message)
     baseSurf = DISPLAYSURF.copy()
-    
+
     # タイルを空白にする
     moveLeft, moveTop = getLeftTopOfTile(movex, movey)
     pygame.draw.rect(baseSurf, BLACK, (moveLeft, moveTop, TILE_SIZE, TILE_SIZE))
-    
+
     for i in range(0, TILE_SIZE, animationSpeed):
         # アニメーションフレームを描画
         DISPLAYSURF.blit(baseSurf, (0, 0))
@@ -245,7 +245,7 @@ def slideAnimation(board, direction, message, animationSpeed):
             drawTile(movex, movey, board[movex][movey], -i, 0)
         elif direction == RIGHT:
             drawTile(movex, movey, board[movex][movey], i, 0)
-        
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -257,21 +257,21 @@ def generateNewPuzzle(numSlides):
     pygame.display.update()
     pygame.time.wait(500)
     lastMove = None
-    
+
     for i in range(numSlides):
         move = getRandomMove(board, lastMove)
         slideAnimation(board, move, 'パズル生成中...', int(TILE_SIZE / 3))
         makeMove(board, move)
         sequence.append(move)
         lastMove = move
-    
+
     return (board, sequence)
 
 def resetAnimation(board, allMoves):
     # リセットアニメーション
     revAllMoves = allMoves[:]
     revAllMoves.reverse()
-    
+
     for move in revAllMoves:
         if move == UP:
             oppositeMove = DOWN
