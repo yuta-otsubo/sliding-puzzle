@@ -30,18 +30,22 @@ class SlidingPuzzle:
         self.background = amazon_style.create_amazon_background(WINDOW_WIDTH, WINDOW_HEIGHT)
         
         # Button setup
-        self.reset_button = amazon_style.create_amazon_button(100, 30, 'Reset', self.basic_font)
-        self.reset_rect = self.reset_button.get_rect(topleft=(10, WINDOW_HEIGHT - 75))
+        button_width = 90  # 少し小さくして3つのボタンが等間隔で配置できるようにする
+        button_spacing = (WINDOW_WIDTH - (button_width * 3)) // 4  # 等間隔の計算
+        button_y = WINDOW_HEIGHT - 80  # ボタンの位置をさらに上にずらす
         
-        self.new_button = amazon_style.create_amazon_button(100, 30, 'New', self.basic_font)
-        self.new_rect = self.new_button.get_rect(topleft=(120, WINDOW_HEIGHT - 75))
+        self.reset_button = amazon_style.create_amazon_button(button_width, 30, 'Reset', self.basic_font)
+        self.reset_rect = self.reset_button.get_rect(topleft=(button_spacing, button_y))
         
-        self.solve_button = amazon_style.create_amazon_button(100, 30, 'Solve', self.basic_font)
-        self.solve_rect = self.solve_button.get_rect(topleft=(230, WINDOW_HEIGHT - 75))
+        self.new_button = amazon_style.create_amazon_button(button_width, 30, 'New', self.basic_font)
+        self.new_rect = self.new_button.get_rect(topleft=(button_spacing * 2 + button_width, button_y))
+        
+        self.solve_button = amazon_style.create_amazon_button(button_width, 30, 'Solve', self.basic_font)
+        self.solve_rect = self.solve_button.get_rect(topleft=(button_spacing * 3 + button_width * 2, button_y))
         
         # Amazon logo
         self.logo = amazon_style.create_amazon_logo(100, 30)
-        self.logo_rect = self.logo.get_rect(topleft=(WINDOW_WIDTH - 110, WINDOW_HEIGHT - 75))
+        self.logo_rect = self.logo.get_rect(topleft=(WINDOW_WIDTH - 110, WINDOW_HEIGHT - 30))
         
         # Pre-generate tile images
         self.tile_images = {}
@@ -156,7 +160,7 @@ class SlidingPuzzle:
         height = BOARD_SIZE * TILE_SIZE
         pygame.draw.rect(self.display_surf, amazon_style.AMAZON_ORANGE, (left - 2, top - 2, width + 4, height + 4), 2)
         
-        # Draw the message
+        # Draw the message and logo
         if message:
             text_surf = self.title_font.render(message, True, amazon_style.AMAZON_ORANGE)
             text_rect = text_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 30))
@@ -169,12 +173,14 @@ class SlidingPuzzle:
             pygame.draw.rect(self.display_surf, amazon_style.AMAZON_ORANGE, bg_rect, 1)
             
             self.display_surf.blit(text_surf, text_rect)
+        
+        # Draw the logo
+        self.display_surf.blit(self.logo, self.logo_rect)
             
         # Draw the buttons
         self.display_surf.blit(self.reset_button, self.reset_rect)
         self.display_surf.blit(self.new_button, self.new_rect)
         self.display_surf.blit(self.solve_button, self.solve_rect)
-        self.display_surf.blit(self.logo, self.logo_rect)
     
     def slide_animation(self, direction, message, animation_speed):
         # Slide animation for tiles
