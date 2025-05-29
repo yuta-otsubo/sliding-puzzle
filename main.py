@@ -55,17 +55,19 @@ class SlidingPuzzle:
         self.main_board, self.solution_seq = self.generate_new_puzzle(80)
     
     def get_starting_board(self):
-        # Return a solved board
-        counter = 1
+        # Return a solved board - 左上から右へ、そして下へと1,2,3...と番号を振る
         board = []
         for x in range(BOARD_SIZE):
             column = []
             for y in range(BOARD_SIZE):
-                if counter == BOARD_SIZE * BOARD_SIZE:
+                # 一番右下を空白にする
+                if x == BOARD_SIZE - 1 and y == BOARD_SIZE - 1:
                     column.append(None)
                 else:
-                    column.append(counter)
-                counter += 1
+                    # 左から右、上から下に1,2,3...と番号を振る
+                    # y*BOARD_SIZE + x + 1 は行優先で番号を振る
+                    number = y * BOARD_SIZE + x + 1
+                    column.append(number)
             board.append(column)
         return board
     
