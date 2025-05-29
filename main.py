@@ -284,6 +284,9 @@ class SlidingPuzzle:
         running = True
         msg = ''
         
+        # カーソルの状態を追跡する変数
+        cursor_on_button = False
+        
         while running:
             slide_to = None
             
@@ -293,7 +296,24 @@ class SlidingPuzzle:
             
             self.draw_board(msg)
             
+            # マウスの位置を取得
+            mouse_pos = pygame.mouse.get_pos()
+            
+            # ボタンの上にマウスがあるかチェック
+            if (self.reset_rect.collidepoint(mouse_pos) or 
+                self.new_rect.collidepoint(mouse_pos) or 
+                self.solve_rect.collidepoint(mouse_pos)):
+                if not cursor_on_button:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # 指差しカーソルに変更
+                    cursor_on_button = True
+            else:
+                if cursor_on_button:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)  # 通常のカーソルに戻す
+                    cursor_on_button = False
+            
             for event in pygame.event.get():
+                if event.type == QUIT:
+                    running = False
                 if event.type == QUIT:
                     running = False
                 elif event.type == MOUSEBUTTONUP:
