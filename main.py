@@ -8,7 +8,7 @@ import amazon_style
 BOARD_SIZE = 4
 TILE_SIZE = 100
 WINDOW_WIDTH = BOARD_SIZE * TILE_SIZE
-WINDOW_HEIGHT = BOARD_SIZE * TILE_SIZE + 50  # Extra space for buttons
+WINDOW_HEIGHT = BOARD_SIZE * TILE_SIZE + 100  # Extra space for buttons and message
 FPS = 30
 
 # Direction constants
@@ -31,17 +31,17 @@ class SlidingPuzzle:
         
         # Button setup
         self.reset_button = amazon_style.create_amazon_button(100, 30, 'Reset', self.basic_font)
-        self.reset_rect = self.reset_button.get_rect(topleft=(10, WINDOW_HEIGHT - 40))
+        self.reset_rect = self.reset_button.get_rect(topleft=(10, WINDOW_HEIGHT - 75))
         
         self.new_button = amazon_style.create_amazon_button(100, 30, 'New', self.basic_font)
-        self.new_rect = self.new_button.get_rect(topleft=(120, WINDOW_HEIGHT - 40))
+        self.new_rect = self.new_button.get_rect(topleft=(120, WINDOW_HEIGHT - 75))
         
         self.solve_button = amazon_style.create_amazon_button(100, 30, 'Solve', self.basic_font)
-        self.solve_rect = self.solve_button.get_rect(topleft=(230, WINDOW_HEIGHT - 40))
+        self.solve_rect = self.solve_button.get_rect(topleft=(230, WINDOW_HEIGHT - 75))
         
         # Amazon logo
         self.logo = amazon_style.create_amazon_logo(100, 30)
-        self.logo_rect = self.logo.get_rect(topleft=(WINDOW_WIDTH - 110, WINDOW_HEIGHT - 40))
+        self.logo_rect = self.logo.get_rect(topleft=(WINDOW_WIDTH - 110, WINDOW_HEIGHT - 75))
         
         # Pre-generate tile images
         self.tile_images = {}
@@ -159,9 +159,17 @@ class SlidingPuzzle:
         # Draw the message
         if message:
             text_surf = self.title_font.render(message, True, amazon_style.AMAZON_ORANGE)
-            text_rect = text_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 25))
+            text_rect = text_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT - 30))
+            
+            # 背景を追加して文字を見やすくする
+            padding = 5
+            bg_rect = pygame.Rect(text_rect.left - padding, text_rect.top - padding,
+                                 text_rect.width + padding * 2, text_rect.height + padding * 2)
+            pygame.draw.rect(self.display_surf, amazon_style.AMAZON_BLUE, bg_rect)
+            pygame.draw.rect(self.display_surf, amazon_style.AMAZON_ORANGE, bg_rect, 1)
+            
             self.display_surf.blit(text_surf, text_rect)
-        
+            
         # Draw the buttons
         self.display_surf.blit(self.reset_button, self.reset_rect)
         self.display_surf.blit(self.new_button, self.new_rect)
