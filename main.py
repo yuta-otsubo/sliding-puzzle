@@ -170,7 +170,8 @@ class SlidingPuzzle:
             bg_rect = pygame.Rect(text_rect.left - padding, text_rect.top - padding,
                                  text_rect.width + padding * 2, text_rect.height + padding * 2)
             pygame.draw.rect(self.display_surf, amazon_style.AMAZON_BLUE, bg_rect)
-            pygame.draw.rect(self.display_surf, amazon_style.AMAZON_ORANGE, bg_rect, 1)
+            # オレンジの枠を背景色と同じ色に変更
+            pygame.draw.rect(self.display_surf, amazon_style.AMAZON_BLUE, bg_rect, 1)
 
             self.display_surf.blit(text_surf, text_rect)
 
